@@ -7,6 +7,11 @@ class List
 public:
     List(): first(nullptr), last(nullptr) {}
 
+    ~List()
+    {
+        clear();
+    }
+
     bool is_empty() 
     {
         return first == nullptr;
