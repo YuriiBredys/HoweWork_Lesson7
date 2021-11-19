@@ -1,6 +1,16 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <sstream>
 using namespace std;
+
+struct Node
+{
+    Node* next;
+    string data;
+
+    Node(string _data) : data(_data), next(nullptr) {}
+};
 
 class List 
 {
@@ -69,6 +79,7 @@ public:
 
         Node* temp = first;
 
+
         while (temp->next != last) 
         { 
             temp = temp->next; 
@@ -88,32 +99,38 @@ public:
         if (first->data == _data)
         {
             remove_first();
-            return;
         }
         else if (last->data == _data)
         {
             remove_last();
-            return;
         }
 
-        Node* slow = first;
-        Node* fast = first->next;
+        Node* temp = first;
 
-        while (fast && fast->data != _data)
+        while (temp != last)
         {
-            fast = fast->next;
-            slow = slow->next;
+            Node* slow = first;
+            Node* fast = first->next;
+
+            while (fast && fast->data != _data)
+            {
+                fast = fast->next;
+                slow = slow->next;
+            }
+
+            if (!fast)
+            {
+                return;
+            }
+
+            slow->next = fast->next;
+
+            delete fast;
+
+            temp->next = slow->next;
+            temp = temp->next;
         }
-
-        if(!fast)
-        {
-            cout << "This element does not exist" << endl;
-            return;
-        }
-
-        slow->next = fast->next;
-
-        delete fast;
+        
     }
 
     void clear()
@@ -125,24 +142,24 @@ public:
     }
 
 private:
-    class Node
-    {
-    public:
-        Node* next;
-        string data;
-
-        Node(string _data) : data(_data), next(nullptr) {}
-    };
-
     Node* first;
     Node* last;
 };
 
+void tokenize(string const& str, const char delim, vector<string>& out)
+{
+    stringstream ss(str);
+
+    string s;
+    while (getline(ss, s, delim)) 
+    {
+        out.push_back(s);
+    }
+}
+
 int main()
 {
     List list;
-    string item;
-    int choice;
     bool quit = false;
 
     do
@@ -153,44 +170,40 @@ int main()
         cout << "3: Delete" << endl;
         cout << "4: Clear" << endl;
         cout << "5: Exit" << endl;
-        cin >> choice;
 
-        switch (choice)
+        string input;
+        getline(cin, input);
+
+        vector<string> items;
+        const char delim = ' ';
+        tokenize(input, delim , items);
+
+        if (items[0] == "insert") 
         {
-        case 1:
-            cout << "\nEnter item to insert: ";
-
-            cin >> item;
-            list.push_back(item);
-
-            break;
-        case 2:
-            cout << endl;
-
-            list.print();
-
-            break;
-        case 3:
-            cout << "\nEnter item to remove: ";
-
-            cin >> item;
-            list.remove(item);
-
-            break;
-        case 4:
-            list.clear();
-
-            break;
-        case 5:
-            quit = true;
-
-            break;
-        default:
-            cout << "\nInvalid selection\n" << endl;
-
-            break;
+            for(int i = 1; i < items.size(); i++)
+            {
+                list.push_back(items[i]);
+            }
         }
+        else if(items[0] == "display")
+        {
+            list.print();
+        }
+        else if(items[0] == "delete")
+        {
+            list.remove(items[1]);
+        }
+        else if(items[0] == "clear")
+        {
+            list.clear();
+        }
+        else if(items[0] == "exit")
+        {
+            quit = true;
+        }
+
     } while (!quit);
+
 
     return 0;
 }

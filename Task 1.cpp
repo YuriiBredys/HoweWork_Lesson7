@@ -19,7 +19,6 @@ public:
 
     virtual ~Human() {};
 
-
 protected:
     string name;
 };
